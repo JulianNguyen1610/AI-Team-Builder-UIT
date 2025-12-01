@@ -11,7 +11,7 @@ Hệ thống tự động xây dựng đội hình bóng đá tối ưu dựa tr
 
 ## 🛠️ Cài đặt
 1. Clone dự án:
-   `git clone https://github.com/JulianNguyen1610/FIFA-26-AI-Team-Builder`
+   `git clone https://github.com/JulianNguyen1610/AI-Team-Builder-UIT`
 2. Cài đặt thư viện:
    `pip install pandas scikit-learn`
 3. Chạy chương trình:
