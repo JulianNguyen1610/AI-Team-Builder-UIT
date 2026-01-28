@@ -2,7 +2,6 @@
 
 # --- CẤU HÌNH ĐƯỜNG DẪN FILE ---
 import os
-# Đường dẫn tương đối đến file data.csv (file gốc và file sau khi phân tích)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FILE_PATH = os.path.join(BASE_DIR, 'male_players_final.csv')
 MODEL_STORAGE_PATH = os.path.join(os.path.dirname(BASE_DIR), 'models')
@@ -16,7 +15,7 @@ OVERALL_COLUMN = 'OVR'
 FEATURES_COLUMNS = [
     'PAC', 'SHO', 'PAS', 'DRI', 'DEF', 'PHY', 'Crossing', 'Finishing', 
     'Heading Accuracy', 'Short Passing', 'Volleys', 'Dribbling', 'Curve', 
-    'FK Accuracy', 'Free Kick Accuracy',  # <--- THÊM DÒNG NÀY (Thêm cả 2 để an toàn)
+    'FK Accuracy', 'Free Kick Accuracy', 
     'Long Passing', 'Ball Control', 'Acceleration', 'Sprint Speed', 
     'Agility', 'Reactions', 'Balance', 'Shot Power', 'Jumping', 'Stamina', 
     'Strength', 'Long Shots', 'Aggression', 'Interceptions', 'Positioning', 
