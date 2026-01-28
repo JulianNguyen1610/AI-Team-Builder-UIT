@@ -4,9 +4,8 @@
 import os
 # Đường dẫn tương đối đến file data.csv (file gốc và file sau khi phân tích)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FILE_PATH = os.path.join(BASE_DIR, 'data.csv')
+FILE_PATH = os.path.join(BASE_DIR, 'male_players_final.csv')
 MODEL_STORAGE_PATH = os.path.join(os.path.dirname(BASE_DIR), 'models')
-
 # --- CẤU HÌNH TÊN CỘT ---
 ID_COLUMN = 'ID'
 POSITION_COLUMN = 'Position'
@@ -17,58 +16,22 @@ OVERALL_COLUMN = 'OVR'
 FEATURES_COLUMNS = [
     'PAC', 'SHO', 'PAS', 'DRI', 'DEF', 'PHY', 'Crossing', 'Finishing', 
     'Heading Accuracy', 'Short Passing', 'Volleys', 'Dribbling', 'Curve', 
-    'Free Kick Accuracy', 'Long Passing', 'Ball Control', 'Acceleration', 'Sprint Speed', 
+    'FK Accuracy', 'Free Kick Accuracy',  # <--- THÊM DÒNG NÀY (Thêm cả 2 để an toàn)
+    'Long Passing', 'Ball Control', 'Acceleration', 'Sprint Speed', 
     'Agility', 'Reactions', 'Balance', 'Shot Power', 'Jumping', 'Stamina', 
     'Strength', 'Long Shots', 'Aggression', 'Interceptions', 'Positioning', 
     'Vision', 'Penalties', 'Composure', 'Def Awareness', 'Standing Tackle', 
     'Sliding Tackle', 'Weak foot', 'Preferred foot_numeric'
 ]
 
-# --- TỪ ĐIỂN NHÓM VỊ TRÍ CHI TIẾT (7 NHÓM - Dùng cho Model Training & Archetype) ---
+# --- TỪ ĐIỂN KIẾN THỨC VỀ VỊ TRÍ ---
 POSITION_GROUPS = {
-    'Goalkeeper': ['GK'],
-    'CenterBack': ['CB', 'RCB', 'LCB', 'SW'],
-    'FullBack':   ['RB', 'LB', 'RWB', 'LWB'],
-    'DefensiveMidfielder': ['CDM', 'RDM', 'LDM'],
-    'CentralMidfielder':   ['CM', 'RCM', 'LCM', 'CAM', 'RAM', 'LAM'], 
-    'Winger':     ['RW', 'LW', 'RM', 'LM'],
-    'Striker':    ['ST', 'CF', 'LS', 'RS']
+    'Defender': ['CB', 'RB', 'LB', 'RWB', 'LWB', 'SW', 'RCB', 'LCB'],
+    'Midfielder': ['CDM', 'CM', 'CAM', 'RM', 'LM', 'RDM', 'LDM', 'RCM', 'LCM'],
+    'Attacker': ['ST', 'CF', 'RW', 'LW'],
+    'Goalkeeper': ['GK']
 }
 
-# --- CẤU HÌNH CHỈ SỐ CHO PHÂN CỤM ---
-ARCHETYPE_FEATURES = {
-    'Goalkeeper': [
-        'GK Diving', 'GK Handling', 'GK Kicking', 'GK Reflexes', 'GK Positioning'
-    ],
-    'CenterBack': [
-        'Def Awareness', 'Standing Tackle', 'Sliding Tackle', 'Heading Accuracy', 
-        'Strength', 'Jumping', 'Interceptions', 'Short Passing', 'Long Passing', 'Aggression'
-    ],
-    'FullBack': [
-        'Acceleration', 'Sprint Speed', 'Crossing', 'Stamina', 'Dribbling', 
-        'Standing Tackle', 'Interceptions', 'Short Passing', 'Agility'
-    ],
-    'DefensiveMidfielder': [
-        'Interceptions', 'Standing Tackle', 'Strength', 'Stamina', 'Short Passing', 
-        'Long Passing', 'Aggression', 'Def Awareness', 'Ball Control'
-    ],
-    'CentralMidfielder': [ 
-        'Vision', 'Short Passing', 'Long Passing', 'Dribbling', 'Ball Control', 
-        'Agility', 'Long Shots', 'Finishing', 'Positioning', 'Reactions'
-    ],
-    'Winger': [
-        'Acceleration', 'Sprint Speed', 'Dribbling', 'Agility', 'Crossing', 
-        'Balance', 'Finishing', 'Shot Power', 'Skill moves'
-    ],
-    'Striker': [
-        'Finishing', 'Positioning', 'Shot Power', 'Heading Accuracy', 'Volleys', 
-        'Strength', 'Acceleration', 'Sprint Speed', 'Jumping', 'Composure',
-        'Short Passing', 'Dribbling', 'Ball Control'
-    ]
-}
-
-# --- YÊU CẦU VỊ TRÍ CHI TIẾT (Dùng cho logic tính điểm trong utils.py) ---
-# ĐÂY LÀ PHẦN BỊ THIẾU GÂY LỖI
 POSITION_REQUIREMENTS_DETAILED = {
     'GK': {'main_positions': ['GK']},
     'CB': {'main_positions': ['CB', 'RCB', 'LCB', 'SW']},
@@ -129,15 +92,29 @@ FORMATION_SLOTS = {
     
 }
 
-# --- HÓA HỌC CHIẾN THUẬT ---
+# --- CẤU HÌNH HÓA HỌC CHIẾN THUẬT (CHEMISTRY) ---
 TACTICAL_BONUSES = {
-    # Cặp trung vệ: Dập + Thòng
-    ('CB', 'CB'): [('Stopper', 'Ball-Playing CB'), ('Elite Defender', 'Ball-Playing CB')],
-    # Cặp tiền vệ trụ: Máy quét + Nhạc trưởng
-    ('CDM', 'CM'): [('Destroyer', 'Advanced Playmaker'), ('Anchor Man', 'Box-to-Box')],
-    # Cặp cánh: Hậu vệ bó trong + Cánh bám biên
-    ('LB', 'LW'): [('Inverted Fullback', 'Traditional Winger'), ('Attacking Wingback', 'Inside Forward')],
-    # Cặp tiền đạo: Làm tường + Chạy nhanh
-    ('ST', 'ST'): [('Target Man', 'Poacher'), ('False 9', 'Inside Forward'), ('Target Man', 'Complete Forward')]
+    ('CB', 'CB'): [('Physical Stopper', 'Ball-Playing Defender'), ('Physical Stopper', 'Standard Defender')],
+    ('CDM', 'CDM'): [('Box-to-Box', 'Playmaker'), ('Anchor Man', 'Box-to-Box'), ('Anchor Man', 'Playmaker')],
+    ('ST', 'ST'): [('Target Man', 'Speedster'), ('Target Man', 'Clinical Finisher'), ('Clinical Finisher', 'Speedster')]
 }
-SYNERGY_BONUS_SCORE = 5
+SYNERGY_BONUS_SCORE = 3.0
+
+# --- CẤU HÌNH CHO PHÂN CỤM (CLUSTERING) ---
+ARCHETYPE_FEATURES = {
+    'Midfielder': ['Short Passing', 'Long Passing', 'Vision', 'Dribbling', 'Ball Control', 'Standing Tackle', 'Interceptions', 'Stamina', 'Aggression', 'PAC', 'SHO'],
+    'Defender': ['Def Awareness', 'Standing Tackle', 'Sliding Tackle', 'Heading Accuracy', 'Jumping', 'Strength', 'Aggression', 'Interceptions', 'PAC', 'Short Passing'],
+    'Attacker': ['Finishing', 'Shot Power', 'Long Shots', 'Positioning', 'Volleys', 'Heading Accuracy', 'PAC', 'DRI', 'Strength', 'Composure', 'Vision'],
+    'Goalkeeper': ['GK Diving', 'GK Handling', 'GK Kicking', 'GK Reflexes', 'GK Positioning']
+}
+
+# --- CẤU HÌNH CHIẾN THUẬT (TACTICAL PRESETS - MỚI) ---
+TACTICAL_PROFILES = {
+    'Balanced (Cân bằng)': {},
+    'Tiki-Taka (Kiểm soát)': {'Short Passing': 0.4, 'Vision': 0.3, 'Ball Control': 0.3, 'Composure': 0.2},
+    'Counter Attack (Phản công)': {'Sprint Speed': 0.4, 'Acceleration': 0.4, 'Long Passing': 0.3, 'Positioning': 0.2},
+    'Wing Play (Tạt cánh)': {'Crossing': 0.5, 'Curve': 0.3, 'Heading Accuracy': 0.4, 'Jumping': 0.3},
+    'High Press (Gegenpressing)': {'Stamina': 0.5, 'Aggression': 0.4, 'Interceptions': 0.3, 'Reactions': 0.3}
+}
+STRICT_RIGHT_SIDED_POSITIONS = ['RB', 'RWB', 'RM']
+STRICT_LEFT_SIDED_POSITIONS = ['LB', 'LWB', 'LM']

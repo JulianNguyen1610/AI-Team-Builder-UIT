@@ -75,8 +75,8 @@ def auto_name_archetype(group_name, centroid_series):
         vals = get_trait_values(stats, traits)
         
         if vals['Playmaking'] > 75: return "Deep-Lying Playmaker"
-        if vals['Physical'] > vals['Defense'] + 3: return "Destroyer" # Chuyên húc ủi
-        if vals['Defense'] > 75: return "Anchor Man" # Chuyên cắt bóng
+        if vals['Physical'] > vals['Defense'] + 3: return "Destroyer" 
+        if vals['Defense'] > 75: return "Anchor Man" 
         return "Holding Midfielder"
 
     # --- 4. CENTRAL MIDFIELDER ---

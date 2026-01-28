@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, Circle, Arc
+from config import FORMATION_SLOTS
 
 def draw_vertical_pitch(ax):
     """Vẽ sân bóng dọc (Vertical Pitch) với tỉ lệ chuẩn."""
@@ -62,11 +63,12 @@ def draw_vertical_pitch(ax):
     plt.plot([30.34, 37.66], [-0.5, -0.5], color=line_color, linewidth=4, zorder=z_lines)
     plt.plot([30.34, 37.66], [length+0.5, length+0.5], color=line_color, linewidth=4, zorder=z_lines)
 
-def visualize_team(team_list, formation_name, team_name):
-    """Vẽ đội hình thoáng hơn, phân tán đều sân."""
-    plt.ioff()
-    plt.close('all')
-
+def draw_pitch(team_list, formation_name, team_name="Best XI"):
+    """
+    Vẽ đội hình thoáng hơn, phân tán đều sân.
+    (Hàm này đã được đổi tên từ visualize_team -> draw_pitch để khớp với app.py)
+    """
+    # Tạo Figure để trả về cho Streamlit (không dùng plt.show)
     fig, ax = plt.subplots(figsize=(9, 13)) 
     fig.patch.set_facecolor('#387B44') 
     ax.set_aspect('equal')
@@ -77,44 +79,26 @@ def visualize_team(team_list, formation_name, team_name):
     
     # --- CẬP NHẬT TỌA ĐỘ MỚI (KÉO GIÃN TRỤC Y) ---
     coordinates = {
-        # GK: Giữ thấp nhưng không quá sát đáy
         'GK': (center_x, 8), 
         'SW': (center_x, 16),
-        
-        # HẬU VỆ: Đẩy lên Y=24-26 (Thoát khỏi vòng cấm 16m50)
         'LB': (8, 26), 'LWB': (8, 36),
-        'LCB': (22, 24), 
-        'CB': (center_x, 24), 
-        'RCB': (46, 24), 
+        'LCB': (22, 24), 'CB': (center_x, 24), 'RCB': (46, 24), 
         'RB': (60, 26), 'RWB': (60, 36),
-        
-        # TIỀN VỆ TRỤ: Đẩy lên Y=42-45 (Giữa sân nhà và vòng tròn trung tâm)
         'LDM': (24, 42), 'CDM': (center_x, 42), 'RDM': (44, 42),
-        
-        # TIỀN VỆ TRUNG TÂM: Đẩy lên Y=60 (Qua vạch giữa sân)
         'LM': (6, 62), 
         'LCM': (22, 60), 'CM': (center_x, 60), 'RCM': (46, 60),
         'RM': (62, 62),
-        
-        # TIỀN VỆ CÔNG: Đẩy lên Y=78 (Sát vòng cấm đối phương)
         'LAM': (22, 78), 'CAM': (center_x, 78), 'RAM': (46, 78),
-        
-        # TIỀN ĐẠO: Đẩy lên Y=92-96 (Trong vòng cấm đối phương)
         'LW': (10, 92), 'RW': (58, 92),
         'ST': (center_x, 96), 'CF': (center_x, 88),
-        
-        # CẶP TIỀN ĐẠO (2 ST): Tách rộng ra (Y=94)
         'LS': (24, 94), 'RS': (44, 94) 
     }
 
-    from config import FORMATION_SLOTS
     slots = FORMATION_SLOTS.get(formation_name, [])
     
     if not slots:
-        print("Chưa định nghĩa slots.")
-        return
+        return fig
 
-    # Logic đếm số lượng vị trí
     position_counts = {pos: slots.count(pos) for pos in set(slots)}
     current_counts = {pos: 0 for pos in set(slots)}
 
@@ -128,45 +112,36 @@ def visualize_team(team_list, formation_name, team_name):
         # Lấy tọa độ mặc định
         coord = coordinates.get(pos_label, (center_x, 50))
         
-        # --- XỬ LÝ TÁCH VỊ TRÍ (Cập nhật cho thoáng) ---
-        
-        # 1. CẶP TIỀN ĐẠO (QUAN TRỌNG)
+        # --- XỬ LÝ TÁCH VỊ TRÍ ---
         if pos_label in ['ST', 'CF'] and total_in_pos == 2:
-            if count_so_far == 1: coord = coordinates['LS'] # Trái
-            if count_so_far == 2: coord = coordinates['RS'] # Phải
+            if count_so_far == 1: coord = coordinates['LS']
+            if count_so_far == 2: coord = coordinates['RS']
             
-        # 2. CẶP TRUNG VỆ
         elif pos_label == 'CB':
             if total_in_pos == 2:
                 if count_so_far == 1: coord = coordinates['LCB']
                 if count_so_far == 2: coord = coordinates['RCB']
             elif total_in_pos == 3:
-                # 3 trung vệ thì giãn đều ra
-                if count_so_far == 1: coord = (20, 24) # Lệch trái
-                if count_so_far == 2: coord = (center_x, 24) # Giữa
-                if count_so_far == 3: coord = (48, 24) # Lệch phải
+                if count_so_far == 1: coord = (20, 24)
+                if count_so_far == 2: coord = (center_x, 24)
+                if count_so_far == 3: coord = (48, 24)
 
-        # 3. CẶP CDM
         elif pos_label == 'CDM' and total_in_pos == 2:
             if count_so_far == 1: coord = coordinates['LDM']
             if count_so_far == 2: coord = coordinates['RDM']
 
-        # 4. CẶP CM
         elif pos_label == 'CM' and total_in_pos == 2:
             if count_so_far == 1: coord = coordinates['LCM']
             if count_so_far == 2: coord = coordinates['RCM']
             
-        # 5. CẶP CAM
         elif pos_label == 'CAM' and total_in_pos == 2:
             if count_so_far == 1: coord = coordinates['LAM']
             if count_so_far == 2: coord = coordinates['RAM']
 
         # --- VẼ CẦU THỦ ---
-        # Vòng tròn
         player_circle = Circle(coord, 3.0, facecolor='#222222', edgecolor='#FFD700', linewidth=2, zorder=10)
         ax.add_patch(player_circle)
         
-        # Tên
         short_name = player.get('Name', 'Unknown').split()[-1]
         if len(short_name) > 9: short_name = short_name[:7] + ".."
             
@@ -174,11 +149,9 @@ def visualize_team(team_list, formation_name, team_name):
                 fontsize=10, color='white', fontweight='bold', zorder=11,
                 bbox=dict(facecolor='black', alpha=0.6, edgecolor='none', boxstyle='round,pad=0.2'))
         
-        # Vị trí
         ax.text(coord[0], coord[1]+0.8, pos_label, ha='center', va='center', 
                 fontsize=7, color='#FFD700', fontweight='bold', zorder=11)
         
-        # OVR
         ax.text(coord[0], coord[1]-1.2, str(player.get('OVR', '')), ha='center', va='center', 
                 fontsize=9, color='white', fontweight='bold', zorder=11)
 
@@ -189,5 +162,5 @@ def visualize_team(team_list, formation_name, team_name):
     plt.ylim(-5, 110)
     plt.axis('off') 
     
-    print("Đang hiển thị sơ đồ... (Đóng cửa sổ để kết thúc)")
-    plt.show(block=True)
+    # Quan trọng: Trả về FIG thay vì plt.show()
+    return fig
