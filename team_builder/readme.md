@@ -13,19 +13,16 @@ Hệ thống tự động xây dựng đội hình bóng đá tối ưu dựa tr
 1. Clone dự án:
    `git clone https://github.com/JulianNguyen1610/AI-Team-Builder-UIT`
 2. Chuẩn bị dữ liệu:
-   - Đặt file dữ liệu gốc (CSV) vào thư mục `team_builder/` với tên `data.csv`
+   - Đặt file dữ liệu gốc (CSV) vào thư mục `team_builder/` với tên `male_players_final.csv`
    - File này sẽ được sử dụng làm file dữ liệu chính cho toàn bộ hệ thống
 3. Cài đặt thư viện:
    `pip install pandas scikit-learn joblib matplotlib numpy`
 4. Chạy chương trình (theo thứ tự):
    - **Bước 1:** `python team_builder/archetype_analyzer.py` 
      - Phân tích và phân loại cầu thủ theo hình mẫu (archetype)
-     - Ghi kết quả trực tiếp vào `data.csv`
+     - Ghi kết quả trực tiếp vào `male_players_final.csv`
    - **Bước 2:** `python team_builder/model_trainer.py` 
      - Huấn luyện các mô hình AI cho từng nhóm vị trí
-     - Sử dụng `data.csv` đã được phân tích ở bước 1
-   - **Bước 3:** `python team_builder/team_builder.py` 
-     - Xây dựng đội hình tối ưu sử dụng các mô hình đã huấn luyện
-     - Sử dụng `data.csv` làm nguồn dữ liệu
-
-## 📊 Kết quả Demo
+     - Sử dụng `male_players_final.csv` đã được phân tích ở bước 1
+   - **Bước 3:** `streamlit run app.py` 
+    
